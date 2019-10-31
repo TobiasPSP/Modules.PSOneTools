@@ -9,3 +9,4 @@
 # LOADING ALL FUNCTION DEFINITIONS:
 
 . $PSScriptRoot\Test-PSOnePort.ps1
+. $PSScriptRoot\Test-PSOnePing.ps1
