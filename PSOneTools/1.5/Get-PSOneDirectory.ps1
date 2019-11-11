@@ -22,7 +22,7 @@
     Error messages due to folders where you have no access permissions are suppressed.
 
     .LINK
-    https://powershell.one
+    https://powershell.one/tricks/assemblies/load-from-memory
     https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.5/Get-PSOneDirectory.ps1
     https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.5/Internal/Install-LongPathSupport.ps1
   #>
