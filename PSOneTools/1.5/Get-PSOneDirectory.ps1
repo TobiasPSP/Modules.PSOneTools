@@ -23,6 +23,8 @@
 
     .LINK
     https://powershell.one
+    https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.5/Get-PSOneDirectory.ps1
+    https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.5/Internal/Install-LongPathSupport.ps1
   #>
 
 
