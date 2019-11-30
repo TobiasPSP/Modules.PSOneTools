@@ -17,7 +17,7 @@
 . $PSScriptRoot\Expand-PSOneToken.ps1
 . $PSScriptRoot\Get-PSOneDirectory.ps1
 . $PSScriptRoot\Group-ObjectFast.ps1
-
+. $PSScriptRoot\Find-PSOneDuplicateFile.ps1
 
 
 
