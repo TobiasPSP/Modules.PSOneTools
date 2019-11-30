@@ -15,6 +15,8 @@
 . $PSScriptRoot\Test-PSOneScript.ps1
 . $PSScriptRoot\Get-PSOneToken.ps1
 . $PSScriptRoot\Expand-PSOneToken.ps1
+. $PSScriptRoot\Get-PSOneDirectory.ps1
+
 
 
 
