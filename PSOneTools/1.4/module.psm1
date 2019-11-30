@@ -13,4 +13,8 @@
 . $PSScriptRoot\Foreach-ObjectFast.ps1
 . $PSScriptRoot\Where-ObjectFast.ps1
 . $PSScriptRoot\Test-PSOneScript.ps1
+. $PSScriptRoot\Get-PSOneToken.ps1
+. $PSScriptRoot\Expand-PSOneToken.ps1
+
+
 
