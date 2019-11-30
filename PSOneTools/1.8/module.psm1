@@ -18,6 +18,6 @@
 . $PSScriptRoot\Get-PSOneDirectory.ps1
 . $PSScriptRoot\Group-ObjectFast.ps1
 . $PSScriptRoot\Find-PSOneDuplicateFile.ps1
-
+. $PSScriptRoot\Show-PSOneApplicationWindow.ps1
 
 
