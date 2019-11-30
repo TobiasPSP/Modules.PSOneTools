@@ -12,3 +12,5 @@
 . $PSScriptRoot\Test-PSOnePing.ps1
 . $PSScriptRoot\Foreach-ObjectFast.ps1
 . $PSScriptRoot\Where-ObjectFast.ps1
+. $PSScriptRoot\Test-PSOneScript.ps1
+
