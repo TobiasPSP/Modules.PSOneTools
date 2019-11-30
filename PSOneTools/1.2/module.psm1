@@ -10,3 +10,5 @@
 
 . $PSScriptRoot\Test-PSOnePort.ps1
 . $PSScriptRoot\Test-PSOnePing.ps1
+. $PSScriptRoot\Foreach-ObjectFast.ps1
+. $PSScriptRoot\Where-ObjectFast.ps1
