@@ -19,5 +19,11 @@
 . $PSScriptRoot\Group-ObjectFast.ps1
 . $PSScriptRoot\Find-PSOneDuplicateFile.ps1
 . $PSScriptRoot\Show-PSOneApplicationWindow.ps1
+. $PSScriptRoot\Get-PSOneClipboardListenerStatus.ps1
+. $PSScriptRoot\Start-PSOneClipboardListener.ps1
+. $PSScriptRoot\Stop-PSOneClipboardListener.ps1
+. $PSScriptRoot\Find-PSOneDuplicateFileFast.ps1
+. $PSScriptRoot\Get-PsOneFileHash.ps1
+
 
 
