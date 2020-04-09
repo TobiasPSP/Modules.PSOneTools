@@ -251,38 +251,3 @@
         return $result
     }
 }
-return
-$stopwatch = [Diagnostics.Stopwatch]::StartNew()
-
-$stopwatch.Reset()
-$stopwatch.Start()
-$data = Get-ChildItem -Path $env:USERPROFILE\Downloads -File |
-Get-PsOnePartialFileHash -StartPosition 1KB -Length 1MB -BufferSize 1MB -AlgorithmName SHA1 
-$stopwatch.Stop()
-
-$result = $data | Group-Object -Property Hash, Length | Where-Object Count -gt 1
-$duplicates = $result.Count 
-$result | ForEach-Object {
-    $_.Group | Select-Object -Property Length, Hash, Path
-} |
-Out-GridView -Title 'Partial Hash'
-
-$seconds = $stopwatch.ElapsedMilliseconds/1000
-'partial hashing took {0:n1} secs. Identified duplicates: {1}' -f $seconds, $duplicates
-return
-$stopwatch.Reset()
-$stopwatch.Start()
-$data = Get-ChildItem -Path $env:USERPROFILE\Downloads -File |
-Get-PsOnePartialFileHash -Force -AlgorithmName SHA1 
-$stopwatch.Stop()
-
-$result = $data | Group-Object -Property Hash, Length | Where-Object Count -gt 1
-$duplicates = $result.Count 
-$result | ForEach-Object {
-    $_.Group | Select-Object -Property Length, Hash, Path
-} |
-Out-GridView -Title 'Full Hash'
-
-$seconds = $stopwatch.ElapsedMilliseconds/1000
-'full hashing took {0:n1} secs. Identified duplicates: {1}' -f $seconds, $duplicates
-
