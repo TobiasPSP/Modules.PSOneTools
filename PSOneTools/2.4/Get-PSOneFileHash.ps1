@@ -77,6 +77,7 @@
         $BufferSize = 32KB,
 
         [Security.Cryptography.HashAlgorithmName]
+        [ValidateSet('MD5','SHA1','SHA256','SHA384','SHA512')]
         # hash algorithm to use. The fastest algorithm is SHA1. MD5 is second best
         # in terms of speed. Slower algorithms provide more secure hashes with a 
         # lesser chance of duplicates with different content
@@ -140,7 +141,6 @@
         # or whether initializing the hash engine in the begin() block is safe.
         try
         {
-            $algorithmName = [Security.Cryptography.HashAlgorithmName]::SHA1
             $algorithm = [Security.Cryptography.HashAlgorithm]::Create($algorithmName)
         }
         catch

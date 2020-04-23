@@ -8,6 +8,7 @@
 
 # LOADING ALL FUNCTION DEFINITIONS:
 
+. $PSScriptRoot\Assert-PSOneFolderExists.ps1
 . $PSScriptRoot\Test-PSOnePort.ps1
 . $PSScriptRoot\Test-PSOnePing.ps1
 . $PSScriptRoot\Foreach-ObjectFast.ps1
