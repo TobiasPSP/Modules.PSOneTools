@@ -79,7 +79,11 @@
         # The default value is SHA1.
         [Security.Cryptography.HashAlgorithmName]
         [ValidateSet("SHA1", "SHA256", "SHA384", "SHA512", "MD5")]
-        $AlgorithmName = 'SHA1'
+        $AlgorithmName = 'SHA1',
+
+        # Gets the items in the specified locations and in all child items of the locations.
+        [switch]
+        $Recurse
     )
 
     # get a hashtable of all files of size greater 0
@@ -94,12 +98,22 @@
             # try and use the fast API way of enumerating files recursively
             # this FAILS whenever there is any "Access Denied" errors
             Write-Progress -Activity 'Acquiring Files' -Status 'Fast Method'
-            [IO.DirectoryInfo]::new($Path).GetFiles($Filter, 'AllDirectories')
+            if ($Recurse) {
+                [IO.DirectoryInfo]::new($Path).GetFiles($Filter, 'AllDirectories')
+            }
+            else {
+                [IO.DirectoryInfo]::new($Path).GetFiles($Filter, 'TopDirectoryOnly')
+            }
         }
         catch {
             # use PowerShell's own (slow) way of enumerating files if any error occurs:
             Write-Progress -Activity 'Acquiring Files' -Status 'Falling Back to Slow Method'
-            Get-ChildItem -Path $Path -Filter $Filter -File -Recurse -ErrorAction Ignore
+            if ($Recurse) {
+                Get-ChildItem -Path $Path -Filter $Filter -File -Recurse -ErrorAction Ignore
+            }
+            else {
+                Get-ChildItem -Path $Path -Filter $Filter -File -ErrorAction Ignore
+            }
         }
     } | 
     # EXCLUDE EMPTY FILES:
