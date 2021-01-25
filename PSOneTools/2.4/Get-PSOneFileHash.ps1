@@ -16,40 +16,6 @@
         Even though you need to calculate the hash twice, calculating a partial hash is very fast and makes sure
         you calculate the expensive full hash only for files that have potential duplicates.
 
-        .PARAMETER Path
-        Path to file with hashable content. This must be a path to a file. It uses an alias
-        of "FullName" to allow the passing of Get-Item or Get-ChildItem objects to this 
-        function using the pipeline.
-
-        .PARAMETER String
-        String content to hash. This will allow the hashing of content that is not coming from a
-        file's contents.
-
-        .PARAMETER StartPosition
-        Specify the byte position to start hashing. If no value is specified the default value
-        is 1000 to skip past the standard file header content.
-
-        .PARAMETER Length
-        Specify the number of bytes to hash. Larger length increases accuracy of hash, whereas a
-        smaller length increases hash calculation performance but runs the risk of duplications.
-        The default value is 1MB.
-
-        .PARAMETER BufferSize
-        Specify an internal buffer size to read chunks. A larger buffer increases raw reading
-        speed but slows down overall performance when too many bytes are read and increases
-        memory pressure. Ideally, the Length parameter value should be equally dividable by the
-        BufferSize parameter value.
-        The default value is 32KB.
-
-        .PARAMETER AlgorithmName
-        Select the hash algorithm to use. The fastest algorithm is SHA1. MD5 is second best
-        in terms of speed. Slower algorithms provide more secure hashes with a lesser chance
-        of duplicates with different content.
-        The default value is SHA1
-
-        .PARAMETER Force
-        This parameter will override partial hashing and always calculate the full hash.
-
         .EXAMPLE
         Get-PsOneFileHash -String "Hello World!" -AlgorithmName MD5
         Calculates the hash for a string using the MD5 algorithm
@@ -76,21 +42,21 @@
         https://powershell.one
 
         .NOTES
-        Updated on 2020-04-10 by Steven Judd:
-            Added parameter validation to AlgorithmName
+        Updated on 2021-01-24 by Steven Judd:
             Added parameter validation to Path parameter
-            Updated help to include parameter content
-            Fixed parameter bug in help text examples
-
-        Features to add:
-            Set Path param to be able to accept an array (maybe)
+            Updated parameter help to better explain parameter usage
+            Set Path param to be able to accept an array
+            Fixed parameter in help text example to use full parameter name
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'File')]
     
     param (
+        # Path to file with hashable content. This must be a path to a file. It uses an alias
+        # of "FullName" to allow the passing of Get-Item or Get-ChildItem objects to this 
+        # function using the pipeline.
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'File', Position = 0)]
-        [string]
+        [string[]]
         [Alias('FullName')]
         [ValidateScript( {
                 if (Test-Path -Path $_ -PathType Leaf) {
@@ -98,30 +64,47 @@
                 }
                 else {
                     #Test-Path check failed
-                    throw "Path `'$_`' is invalid. It must be a file."
+                    throw "Path '$_' is invalid. It must be a file."
                 }
             })]
         $Path,
 
+        # String content to hash. This will allow the hashing of content that is not coming from a
+        # file's contents.
         [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'String', Position = 0)]
         [string]
         $String,
 
+        # Specify the byte position to start hashing. If no value is specified the default value
+        # is 1000 to skip past the standard file header content.
         [int]
         [ValidateRange(0, 1TB)]
         $StartPosition = 1000,
 
+        # Specify the number of bytes to hash. Larger length increases accuracy of hash, whereas a
+        # smaller length increases hash calculation performance but runs the risk of duplications.
+        # The default value is 1MB.
         [long]
         [ValidateRange(1KB, 1TB)]
         $Length = 1MB,
 
+        # Specify an internal buffer size to read chunks. A larger buffer increases raw reading
+        # speed but slows down overall performance when too many bytes are read and increases
+        # memory pressure. Ideally, the Length parameter value should be equally dividable by the
+        # BufferSize parameter value.
+        # The default value is 32KB.
         [int]
         $BufferSize = 32KB,
 
+        # Select the hash algorithm to use. The fastest algorithm is SHA1. MD5 is second best
+        # in terms of speed. Slower algorithms provide more secure hashes with a lesser chance
+        # of duplicates with different content.
+        # The default value is SHA1
         [Security.Cryptography.HashAlgorithmName]
         [ValidateSet('MD5', 'SHA1', 'SHA256', 'SHA384', 'SHA512')]
         $AlgorithmName = 'SHA1',
 
+        # This parameter will override partial hashing and always calculate the full hash.
         [Switch]
         $Force
     )
@@ -139,125 +122,127 @@
     }
     
     process {
-        # prepare the return object:
-        $result = [PSCustomObject]@{
-            Path              = $Path
-            Length            = 0
-            Algorithm         = $AlgorithmName
-            Hash              = ''
-            IsPartialHash     = $false
-            StartPosition     = $StartPosition
-            HashedContentSize = $Length
-        }
-        if ($isFile) {
-            try {
-                # check whether the file size is greater than the limit we set:
-                $file = [IO.FileInfo]$Path
-                $result.Length = $file.Length
-
-                # test whether partial hashes should be used and if so sets IsPartialHash to $true:
-                $result.IsPartialHash = ($result.Length -gt $minDataLength) -and (-not $Force.IsPresent)
+        foreach ($item in $Path) {
+            # prepare the return object:
+            $result = [PSCustomObject]@{
+                Path              = $item
+                Length            = 0
+                Algorithm         = $AlgorithmName
+                Hash              = ''
+                IsPartialHash     = $false
+                StartPosition     = $StartPosition
+                HashedContentSize = $Length
             }
-            catch {
-                throw "Unable to access $Path"
-            }
-        } #end if ($isFile)
-        else {
-            $result.Length = $String.Length
-            $result.IsPartialHash = ($result.Length -gt $minDataLength) -and (-not $Force.IsPresent)
-        }
-        # initialize the hash algorithm to use
-        # I decided to initialize the hash engine for every file to avoid collisions
-        # when using transform blocks. I am not sure whether this is really necessary,
-        # or whether initializing the hash engine in the begin() block is safe.
-        try {
-            $algorithm = [Security.Cryptography.HashAlgorithm]::Create($AlgorithmName)
-        }
-        catch {
-            throw "Unable to initialize algorithm $AlgorithmName"
-        }
-        try {
             if ($isFile) {
-                # read the file, and make sure the file isn't changed while we read it:
-                $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+                try {
+                    # check whether the file size is greater than the limit we set:
+                    $file = [IO.FileInfo]$item
+                    $result.Length = $file.Length
 
-                # is the file larger than the threshold so that a partial hash should be calculated?
-                if ($result.IsPartialHash) {
-                    # keep a counter of the bytes that were read for this file:
-                    $bytesToRead = $Length
-
-                    # move to the requested start position inside the file content:
-                    $stream.Position = $StartPosition
-
-                    # read the file content in chunks until the requested data is fed into the hash algorithm
-                    while ($bytesToRead -gt 0) {
-                        # either read the full chunk size, or whatever is left to read the desired total length:
-                        $bytesRead = $stream.Read($buffer, 0, [Math]::Min($bytesToRead, $bufferSize))
-
-                        # we should ALWAYS read at least one byte:
-                        if ($bytesRead -gt 0) {
-                            # subtract the bytes read from the total number of bytes to read
-                            # in order to calculate how many bytes need to be read in the next
-                            # iteration of this loop:
-                            $bytesToRead -= $bytesRead
-
-                            # if there won't be any more bytes to read, this is the last chunk of data,
-                            # so we can finalize hash generation:
-                            if ($bytesToRead -eq 0) {
-                                $null = $algorithm.TransformFinalBlock($buffer, 0, $bytesRead)
-                            }
-                            # else, if there are more bytes to follow, simply add them to the hash
-                            # algorithm:
-                            else {
-                                $null = $algorithm.TransformBlock($buffer, 0, $bytesRead, $buffer, 0)
-                            }
-                        } #end if ($bytesRead -gt 0)
-                        else {
-                            throw 'This should never occur: no bytes read.'
-                        }
-                    } #end while ($bytesToRead -gt 0)
-                } #end if ($result.IsPartialHash)
-                else {
-                    # either the file was smaller than the buffer size, or -Force was used:
-                    # the entire file hash is calculated:
-                    $null = $algorithm.ComputeHash($stream)
+                    # test whether partial hashes should be used and if so sets IsPartialHash to $true:
+                    $result.IsPartialHash = ($result.Length -gt $minDataLength) -and (-not $Force.IsPresent)
+                }
+                catch {
+                    throw "Unable to access $item"
                 }
             } #end if ($isFile)
             else {
-                if ($result.IsPartialHash) {
-                    $bytes = [Text.Encoding]::UTF8.GetBytes($String.SubString($StartPosition, $Length))
-                }
+                $result.Length = $String.Length
+                $result.IsPartialHash = ($result.Length -gt $minDataLength) -and (-not $Force.IsPresent)
+            }
+            # initialize the hash algorithm to use
+            # I decided to initialize the hash engine for every file to avoid collisions
+            # when using transform blocks. I am not sure whether this is really necessary,
+            # or whether initializing the hash engine in the begin() block is safe.
+            try {
+                $algorithm = [Security.Cryptography.HashAlgorithm]::Create($AlgorithmName)
+            }
+            catch {
+                throw "Unable to initialize algorithm $AlgorithmName"
+            }
+            try {
+                if ($isFile) {
+                    # read the file, and make sure the file isn't changed while we read it:
+                    $stream = [IO.File]::Open($item, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+
+                    # is the file larger than the threshold so that a partial hash should be calculated?
+                    if ($result.IsPartialHash) {
+                        # keep a counter of the bytes that were read for this file:
+                        $bytesToRead = $Length
+
+                        # move to the requested start position inside the file content:
+                        $stream.Position = $StartPosition
+
+                        # read the file content in chunks until the requested data is fed into the hash algorithm
+                        while ($bytesToRead -gt 0) {
+                            # either read the full chunk size, or whatever is left to read the desired total length:
+                            $bytesRead = $stream.Read($buffer, 0, [Math]::Min($bytesToRead, $bufferSize))
+
+                            # we should ALWAYS read at least one byte:
+                            if ($bytesRead -gt 0) {
+                                # subtract the bytes read from the total number of bytes to read
+                                # in order to calculate how many bytes need to be read in the next
+                                # iteration of this loop:
+                                $bytesToRead -= $bytesRead
+
+                                # if there won't be any more bytes to read, this is the last chunk of data,
+                                # so we can finalize hash generation:
+                                if ($bytesToRead -eq 0) {
+                                    $null = $algorithm.TransformFinalBlock($buffer, 0, $bytesRead)
+                                }
+                                # else, if there are more bytes to follow, simply add them to the hash
+                                # algorithm:
+                                else {
+                                    $null = $algorithm.TransformBlock($buffer, 0, $bytesRead, $buffer, 0)
+                                }
+                            } #end if ($bytesRead -gt 0)
+                            else {
+                                throw 'This should never occur: no bytes read.'
+                            }
+                        } #end while ($bytesToRead -gt 0)
+                    } #end if ($result.IsPartialHash)
+                    else {
+                        # either the file was smaller than the buffer size, or -Force was used:
+                        # the entire file hash is calculated:
+                        $null = $algorithm.ComputeHash($stream)
+                    }
+                } #end if ($isFile)
                 else {
-                    $bytes = [Text.Encoding]::UTF8.GetBytes($String)
+                    if ($result.IsPartialHash) {
+                        $bytes = [Text.Encoding]::UTF8.GetBytes($String.SubString($StartPosition, $Length))
+                    }
+                    else {
+                        $bytes = [Text.Encoding]::UTF8.GetBytes($String)
+                    }
+                    $null = $algorithm.ComputeHash($bytes)
+                } #end else
+
+                # the calculated hash is stored in the prepared return object:
+                $result.Hash = [BitConverter]::ToString($algorithm.Hash).Replace('-', '')
+
+                #if IsPartialHash is $false, set the StartPosition and HashedContentSize values
+                if (-not($result.IsPartialHash)) {
+                    $result.StartPosition = 0
+                    $result.HashedContentSize = $result.Length
                 }
-                $null = $algorithm.ComputeHash($bytes)
-            } #end else
-
-            # the calculated hash is stored in the prepared return object:
-            $result.Hash = [BitConverter]::ToString($algorithm.Hash).Replace('-', '')
-
-            #if IsPartialHash is $false, set the StartPosition and HashedContentSize values
-            if (-not($result.IsPartialHash)) {
-                $result.StartPosition = 0
-                $result.HashedContentSize = $result.Length
+            } #end try block
+            catch {
+                throw "Unable to calculate partial hash: $_"
             }
-        } #end try block
-        catch {
-            throw "Unable to calculate partial hash: $_"
-        }
-        finally {
-            if ($PSCmdlet.ParameterSetName -eq 'File') {
-                # free stream
-                $stream.Close()
-                $stream.Dispose()
-            }
+            finally {
+                if ($PSCmdlet.ParameterSetName -eq 'File') {
+                    # free stream
+                    $stream.Close()
+                    $stream.Dispose()
+                }
 
-            # free algorithm and its resources:
-            $algorithm.Clear()
-            $algorithm.Dispose()
-        } #end finally block
-    
-        # return result for the file
-        return $result
+                # free algorithm and its resources:
+                $algorithm.Clear()
+                $algorithm.Dispose()
+            } #end finally block
+        
+            # return result for the file
+            $result
+        } #end foreach $item in $Path
     } #end process block
 } #end Get-PSOneFileHash function
