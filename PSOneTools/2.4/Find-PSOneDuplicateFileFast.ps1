@@ -10,31 +10,6 @@
             Calculating a full hash for large files may take a very long time though. So you may be better off using other
             strategies to identify duplicate file content, i.e. look at identical creation times, etc.
 
-        .PARAMETER Path
-            Enter the Path of the folder to recursively search for duplicate files.
-            The default value is the current folder.
-
-        .PARAMETER Filter
-            Enter a filter value to apply to the file search. 
-            The default value is '*' (all Files) 
-        
-        .PARAMETER TestPartialHash
-            When there are multiple files with same partial hash they may still be different.
-            When setting this switch, full hashes are calculated for all partial hashes.
-            Caution: setting this switch parameter may take a very long time for large 
-            files and/or network paths.
-        
-        .PARAMETER MaxFileSize
-            If the file size is larger than the MaxFileSize value the function will use a
-            partial hash using the specified amount of the beginning of the file.
-            The default value is 100KB.
-
-        .PARAMETER AlgorithmName
-            Select the hash algorithm to use. The fastest algorithm is SHA1. MD5 is second best
-            in terms of speed. Slower algorithms provide more secure hashes with a lesser chance
-            of duplicates with different content.
-            The default value is SHA1
-
         .EXAMPLE
             $Path = [Environment]::GetFolderPath('MyDocuments')
             Find-PSOneDuplicateFileFast -Path $Path 
@@ -55,8 +30,7 @@
             https://powershell.one
 
         .NOTES
-            Updated by Steven Judd on 2020/05/06:
-                Added Parameter entries to the help block text
+            Updated by Steven Judd on 2021/01/24:
                 Added ValidateScript to Path parameter to ensure the value is a directory and set the path default to the current path
                 Set the Filter parameter value for the enumeration of the files (it was set to always check all files)
                 Added AlgorithmName parameter to allow the algorithm to be specified
@@ -65,7 +39,8 @@
     #>
 
     param(
-        # Path of folder to recursively search
+        # Enter the Path of the folder to recursively search for duplicate files.
+        # The default value is the current folder.
         [String]
         [Parameter(Position = 0)]
         [ValidateScript( {
@@ -79,21 +54,32 @@
             })]
         $Path = '.',
     
+        # Enter a filter value to apply to the file search.
+        # The default value is '*' (all Files) 
         [String]
         [Parameter(Position = 1)]
         $Filter = '*',
         
+        # When there are multiple files with same partial hash they may still be different.
+        # When setting this switch, full hashes are calculated for all partial hashes.
+        # Caution: setting this switch parameter may take a very long time for large 
+        # files and/or network paths.
         [switch]
         $TestPartialHash,
         
-        # use partial hashes for files larger than this:
+        # If the file size is larger than the MaxFileSize value the function will use a
+        # partial hash using the specified amount of the beginning of the file.
+        # The default value is 100KB.
         [int64]
         $MaxFileSize = 100KB,
 
+        # Select the hash algorithm to use. The fastest algorithm is SHA1. MD5 is second best
+        # in terms of speed. Slower algorithms provide more secure hashes with a lesser chance
+        # of duplicates with different content.
+        # The default value is SHA1.
         [Security.Cryptography.HashAlgorithmName]
         [ValidateSet("SHA1", "SHA256", "SHA384", "SHA512", "MD5")]
         $AlgorithmName = 'SHA1'
-
     )
 
     # get a hashtable of all files of size greater 0
