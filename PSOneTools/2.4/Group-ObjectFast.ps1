@@ -79,7 +79,7 @@ function Group-ObjectFast
             {
                 [PSCustomObject]@{
                     Count = $hashtable[$_].Count
-                    Name = $key
+                    Name = $_
                     Group = $hashtable[$_]
                 }
             }
