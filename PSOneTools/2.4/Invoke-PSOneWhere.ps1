@@ -48,6 +48,8 @@
       https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Invoke-PSOneWhere.ps1
   #>
 
+  # creates command shortcuts for the function
+  [Alias('Where-ObjectFast','WhereObj')]
 
   param
   (

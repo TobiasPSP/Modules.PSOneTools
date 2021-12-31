@@ -1,5 +1,8 @@
 ﻿function Invoke-PSOneGroup
 {
+    # creates command shortcuts for the function
+    [Alias('Group-ObjectFast','GroupObj')]
+
     [CmdletBinding(DefaultParameterSetName='Analysis')]
     param
     (

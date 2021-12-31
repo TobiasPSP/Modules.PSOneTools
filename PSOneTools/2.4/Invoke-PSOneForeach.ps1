@@ -46,7 +46,10 @@
       https://powershell.one/tricks/performance/pipeline
       https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Invoke-PSOneForeach.ps1
   #>
-  
+
+  # creates command shortcuts for the function
+  [Alias('ForEach-ObjectFast','ForEachObj')]
+
   param
   (
     # executes for each pipeline element
