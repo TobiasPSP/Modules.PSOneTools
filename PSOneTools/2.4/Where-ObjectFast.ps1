@@ -48,6 +48,8 @@
       https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Where-ObjectFast.ps1
   #>
 
+  # creates a command shortcut for the function
+  [Alias('WhereObj')]
 
   param
   (

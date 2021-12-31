@@ -1,7 +1,8 @@
-﻿
-
-function Group-ObjectFast
+﻿function Group-ObjectFast
 {
+    # creates a command shortcut for the function
+    [Alias('GroupObj')]
+
     [CmdletBinding(DefaultParameterSetName='Analysis')]
     param
     (
