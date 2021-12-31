@@ -33,7 +33,7 @@ PrivateData = @{
         LicenseUri = 'https://en.wikipedia.org/wiki/MIT_License'
         ProjectUri = 'https://github.com/TobiasPSP/Modules.PSOneTools/tree/master/PSOneTools'
         # IconUri = ''
-        ReleaseNotes = 'Added Assert-PsoFolderExists'
+        ReleaseNotes = 'Added Assert-PsOneFolderExists'
     } 
 } 
 # HelpInfo-URI dieses Moduls
