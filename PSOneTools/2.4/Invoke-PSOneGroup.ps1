@@ -1,6 +1,4 @@
-﻿
-
-function Group-ObjectFast
+﻿function Invoke-PSOneGroup
 {
     [CmdletBinding(DefaultParameterSetName='Analysis')]
     param
