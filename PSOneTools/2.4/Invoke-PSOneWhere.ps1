@@ -1,38 +1,38 @@
-﻿function Where-ObjectFast
+﻿function Invoke-PSOneWhere
 {
   <#
       .SYNOPSIS
       Faster Where-Object
 
       .DESCRIPTION
-      Where-ObjectFast can replace the built-in Where-Object and improves pipeline speed considerably.
-      Where-ObjectFast supports only the scriptblock version of Where-Object, so you can replace
+      Invoke-PSOneWhere can replace the built-in Where-Object and improves pipeline speed considerably.
+      Invoke-PSOneWhere supports only the scriptblock version of Where-Object, so you can replace
     
       Get-Service | Where-Object { $_.Status -eq 'Running' }
     
       with
     
-      Get-Service | Where-ObjectFast { $_.Status -eq 'Running' }
+      Get-Service | Invoke-PSOneWhere { $_.Status -eq 'Running' }
     
       but you cannot currently replace the short form of Where-Object:
     
       Get-Service | Where-Object Status -eq Running
 
-      Where-ObjectFast has a performance benefit per iteration, so the more objects
+      Invoke-PSOneWhere has a performance benefit per iteration, so the more objects
       you send through the pipeline, the more significant performace benefits you will see.
 
-      Where-ObjectFast is using a steppable pipeline internally which performs better.
+      Invoke-PSOneWhere is using a steppable pipeline internally which performs better.
       However because of this, the debugging experience will be different, and internal
       variables such as $MyInvocation may yield different results. For most every-day tasks,
       these changes are not important.
 
-      A complete explanation of what Where-ObjectFast does can be found here:
+      A complete explanation of what Invoke-PSOneWhere does can be found here:
       https://powershell.one/tricks/performance/pipeline
 
       .EXAMPLE
       $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-      $result = 1..1000000 | Where-ObjectFast -FilterScript {
+      $result = 1..1000000 | Invoke-PSOneWhere -FilterScript {
       $_ % 5
       }
 
@@ -40,14 +40,16 @@
       $report -f $result.Count, $stopwatch.Elapsed.TotalSeconds
   
       Demos the speed improvements. Run this script to see how well it performs,
-      then replace Where-ObjectFast with the default Where-Object, and check out
+      then replace Invoke-PSOneWhere with the default Where-Object, and check out
       the performace difference. $result is the same in both cases.
 
       .LINK
       https://powershell.one/tricks/performance/pipeline
-      https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Where-ObjectFast.ps1
+      https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Invoke-PSOneWhere.ps1
   #>
 
+  # creates command shortcuts for the function
+  [Alias('Where-ObjectFast','WhereObj')]
 
   param
   (

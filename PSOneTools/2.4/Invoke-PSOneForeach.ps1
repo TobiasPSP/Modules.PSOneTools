@@ -1,37 +1,37 @@
-﻿function Foreach-ObjectFast
+﻿function Invoke-PSOneForeach
 {
   <#
       .SYNOPSIS
-      Faster Foreach-Object
+      Faster ForEach-Object
 
       .DESCRIPTION
-      Foreach-ObjectFast can replace the built-in Foreach-Object and improves pipeline speed considerably.
-      Foreach-ObjectFast supports only the most commonly used parameters -Begin, -Process, and -End, so you can replace
+      Invoke-PSOneForeach can replace the built-in ForEach-Object and improves pipeline speed considerably.
+      Invoke-PSOneForeach supports only the most commonly used parameters -Begin, -Process, and -End, so you can replace
     
-      1..100 | Foreach-Object { 'Server{0:d3}' -f $_ }
+      1..100 | ForEach-Object { 'Server{0:d3}' -f $_ }
     
       with
     
-      1..100 | Foreach-ObjectFast { 'Server{0:d3}' -f $_ }
+      1..100 | Invoke-PSOneForeach { 'Server{0:d3}' -f $_ }
     
-      but you cannot currently replace instances of Foreach-Object that uses the less commonly used parameters, 
+      but you cannot currently replace instances of ForEach-Object that uses the less commonly used parameters,
       like -RemainingScripts, -MemberNames, and -ArgumentList
 
-      Foreach-ObjectFast has a performance benefit per iteration, so the more objects
+      Invoke-PSOneForeach has a performance benefit per iteration, so the more objects
       you send through the pipeline, the more significant performace benefits you will see.
 
-      Foreach-ObjectFast is using a steppable pipeline internally which performs better.
+      Invoke-PSOneForeach is using a steppable pipeline internally which performs better.
       However because of this, the debugging experience will be different, and internal
       variables such as $MyInvocation may yield different results. For most every-day tasks,
       these changes are not important.
 
-      A complete explanation of what Where-ObjectFast does can be found here:
+      A complete explanation of what Invoke-PSOneWhere does can be found here:
       https://powershell.one/tricks/performance/pipeline
 
       .EXAMPLE
       $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-      $result = 1..1000000 | Foreach-ObjectFast -Process {
+      $result = 1..1000000 | Invoke-PSOneForeach -Process {
         "I am at $_"
       }
 
@@ -39,14 +39,17 @@
       $report -f $result.Count, $stopwatch.Elapsed.TotalSeconds 
       
       Demos the speed improvements. Run this script to see how well it performs,
-      then replace Foreach-ObjectFast with the default Foreach-Object, and check out
+      then replace Invoke-PSOneForeach with the default ForEach-Object, and check out
       the performace difference. $result is the same in both cases.
 
       .LINK
       https://powershell.one/tricks/performance/pipeline
-      https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Foreach-ObjectFast.ps1
+      https://github.com/TobiasPSP/Modules.PSOneTools/blob/master/PSOneTools/1.2/Invoke-PSOneForeach.ps1
   #>
-  
+
+  # creates command shortcuts for the function
+  [Alias('ForEach-ObjectFast','ForEachObj')]
+
   param
   (
     # executes for each pipeline element
