@@ -53,7 +53,7 @@
     {
       # use PowerShell's own (slow) way of enumerating files if any error occurs:
       Write-Progress -Activity 'Acquiring Files' -Status 'Falling Back to Slow Method'
-      Get-ChildItem -Path $Path -File -Recurse -ErrorAction Ignore
+      Get-ChildItem -Path $Path -File -Recurse -Filter $Filter -ErrorAction Ignore
     }
   } |
   # EXCLUDE EMPTY FILES:
