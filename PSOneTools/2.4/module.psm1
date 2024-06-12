@@ -11,13 +11,13 @@
 . $PSScriptRoot\Assert-PSOneFolderExists.ps1
 . $PSScriptRoot\Test-PSOnePort.ps1
 . $PSScriptRoot\Test-PSOnePing.ps1
-. $PSScriptRoot\Foreach-ObjectFast.ps1
-. $PSScriptRoot\Where-ObjectFast.ps1
+. $PSScriptRoot\Invoke-PSOneForeach.ps1
+. $PSScriptRoot\Invoke-PSOneWhere.ps1
 . $PSScriptRoot\Test-PSOneScript.ps1
 . $PSScriptRoot\Get-PSOneToken.ps1
 . $PSScriptRoot\Expand-PSOneToken.ps1
 . $PSScriptRoot\Get-PSOneDirectory.ps1
-. $PSScriptRoot\Group-ObjectFast.ps1
+. $PSScriptRoot\Invoke-PSOneGroup.ps1
 . $PSScriptRoot\Find-PSOneDuplicateFile.ps1
 . $PSScriptRoot\Show-PSOneApplicationWindow.ps1
 . $PSScriptRoot\Get-PSOneClipboardListenerStatus.ps1
